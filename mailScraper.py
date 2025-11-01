@@ -9,7 +9,7 @@ import random
 from urllib.parse import urljoin, urlparse
 import sys
 
-# --- Configuration ------------
+#  Configuration
 
 USER_AGENTS = [
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36',
@@ -23,7 +23,7 @@ MAX_PAGES = 3
 MAIL_REGEX = re.compile(r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}')
 
 
-# --- Recherche DuckDuckGo --------------
+# search DuckDuckGo 
 
 def search_duckduckgo(query, num_pages=1):
     urls = []
@@ -52,14 +52,14 @@ def search_duckduckgo(query, num_pages=1):
     return urls
 
 
-# --- Filtre intelligent par activité -----------
+# filtre par activité
 
 def is_relevant_website(url, activite):
     parsed = urlparse(url)
     domain = parsed.netloc.lower()
     path = parsed.path.lower()
 
-    # --- Exclusions universelles --------------
+    #  Exclusions rs
     exclude_domains = [
         'facebook.com', 'instagram.com', 'twitter.com', 'linkedin.com',
         'youtube.com', 'wikipedia.org', 'duckduckgo.com', 'google.com', 'cnil.fr', 'pariszigzag.fr',
@@ -68,7 +68,7 @@ def is_relevant_website(url, activite):
     if any(ex in domain for ex in exclude_domains):
         return False
 
-    # --- Exclusions par activité --------------
+    # exclusions par activité
     exclude_by_activite = {
         'restaurant': ['tripadvisor.', 'lafourchette.', 'yelp.'],
         'coiffeur': ['treatwell.', 'plancity.'],
@@ -79,7 +79,7 @@ def is_relevant_website(url, activite):
         if any(ex in domain for ex in exclude_by_activite[activite]):
             return False
 
-    # --- Mots-clés positifs ------------------
+    # mots-clés positif
     keywords = {
         'immobilière': ['immobilier', 'agence', 'immo'],
         'restaurant': ['restaurant', 'resto', 'bistro', 'brasserie', 'cuisine'],
@@ -94,7 +94,7 @@ def is_relevant_website(url, activite):
     return relevant
 
 
-# --- Extraction e-mails ---
+# extraction mails
 
 def extract_emails_from_url(url, visited=None):
     if visited is None:
@@ -111,17 +111,17 @@ def extract_emails_from_url(url, visited=None):
         soup = BeautifulSoup(response.text, 'html.parser')
         text = soup.get_text()
 
-        # Regex
+        # regex
         emails.update(MAIL_REGEX.findall(text))
 
-        # mailto:
+        # mailto
         for a in soup.find_all('a', href=True):
             if 'mailto:' in a['href']:
                 email = a['href'].split('mailto:')[1].split('?')[0].strip()
                 if email:
                     emails.add(email)
 
-        # Suivre page contact
+        # follow page contact
         contact_texts = ['contact', 'nous contacter', 'contactez-nous', 'mention', 'rgpd', 'legal']
         for a in soup.find_all('a', href=True):
             link_text = a.get_text(strip=True).lower()
@@ -139,7 +139,9 @@ def extract_emails_from_url(url, visited=None):
         return set()
 
 
-# --- Main ----------------
+# =======================================
+# ============== MAIN ====================
+# =======================================
 
 def main():
     parser = argparse.ArgumentParser(
@@ -166,16 +168,16 @@ Sortie : {args.output}
 """)
     print("=" * 70)
 
-    # 1. Recherche
+    # serach
     print("Étape 1 : Recherche DuckDuckGo...")
     candidate_urls = search_duckduckgo(query, num_pages=args.pages)
 
-    # 2. Filtre
+    # filtre
     print(f"\nÉtape 2 : Filtrage des sites pertinents...")
     relevant_urls = [u for u in candidate_urls if is_relevant_website(u, activite)]
     print(f"{len(relevant_urls)} sites pertinents trouvés")
 
-    # 3. Extraction
+    # extract
     print(f"\nÉtape 3 : Extraction des e-mails...")
     results = {}
     for i, url in enumerate(relevant_urls, 1):
@@ -188,7 +190,7 @@ Sortie : {args.output}
             print("    Aucun e-mail")
         time.sleep(random.uniform(*DELAY))
 
-    # 4. CSV
+    # CSV
     with open(args.output, 'w', newline='', encoding='utf-8') as f:
         writer = csv.writer(f)
         writer.writerow(['Ville', 'Activité', 'URL', 'Email'])
