@@ -33,8 +33,8 @@
 
 ### Dependencies
 
-```bash
-pip install requests beautifulsoup4 lxml```
+bash
+```pip install requests beautifulsoup4 lxml```
 
 # Usage 
 
