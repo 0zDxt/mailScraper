@@ -1,12 +1,16 @@
 # email Scraper (Python)
 
-> **Respectful B2B prospecting tool** – DuckDuckGo search + Smart filtering + Email extraction from "Contact" pages.
+> **DuckDuckGo search + Smart filtering + Email extraction from "Contact" pages.**
 
 ![Python](https://img.shields.io/badge/Python-3.8%2B-blue)
 ![License](https://img.shields.io/badge/License-MIT-green)
 ![Status](https://img.shields.io/badge/Status-Stable-brightgreen)
 
 ---
+
+**FOR EDUCATIONAL PURPOSE ONLY**
+
+**WIP**
 
 ## Features
 
