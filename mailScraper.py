@@ -79,7 +79,6 @@ def is_relevant_website(url, activite):
         if any(ex in domain for ex in exclude_by_activite[activite]):
             return False
 
-    # mots-clés positif
     keywords = {
         'immobilière': ['immobilier', 'agence', 'immo'],
         'restaurant': ['restaurant', 'resto', 'bistro', 'brasserie', 'cuisine'],
@@ -94,7 +93,7 @@ def is_relevant_website(url, activite):
     return relevant
 
 
-# extraction mails
+# fonction extraction mails
 
 def extract_emails_from_url(url, visited=None):
     if visited is None:
@@ -111,7 +110,6 @@ def extract_emails_from_url(url, visited=None):
         soup = BeautifulSoup(response.text, 'html.parser')
         text = soup.get_text()
 
-        # regex
         emails.update(MAIL_REGEX.findall(text))
 
         # mailto
@@ -140,12 +138,12 @@ def extract_emails_from_url(url, visited=None):
 
 
 # =======================================
-# ============== MAIN ====================
+# ============== FONCTION MAIN ====================
 # =======================================
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Scraper éthique d'e-mails professionnels (toutes activités)",
+        description="Scraper d'e-mails professionnels",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
     parser.add_argument("ville", help="Ville cible (ex: Lyon, Paris)")
@@ -159,7 +157,7 @@ def main():
     query = f"{activite} {ville} site:.fr"
 
     print(f"""
-SCRAPER PRO ÉTHIQUE
+SCRAPER PRO
 Ville : {ville}
 Activité : {activite}
 Recherche : "{query}"
@@ -172,12 +170,10 @@ Sortie : {args.output}
     print("Étape 1 : Recherche DuckDuckGo...")
     candidate_urls = search_duckduckgo(query, num_pages=args.pages)
 
-    # filtre
     print(f"\nÉtape 2 : Filtrage des sites pertinents...")
     relevant_urls = [u for u in candidate_urls if is_relevant_website(u, activite)]
     print(f"{len(relevant_urls)} sites pertinents trouvés")
 
-    # extract
     print(f"\nÉtape 3 : Extraction des e-mails...")
     results = {}
     for i, url in enumerate(relevant_urls, 1):
@@ -190,7 +186,6 @@ Sortie : {args.output}
             print("    Aucun e-mail")
         time.sleep(random.uniform(*DELAY))
 
-    # CSV
     with open(args.output, 'w', newline='', encoding='utf-8') as f:
         writer = csv.writer(f)
         writer.writerow(['Ville', 'Activité', 'URL', 'Email'])
